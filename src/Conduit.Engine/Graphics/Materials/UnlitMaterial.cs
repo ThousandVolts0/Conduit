@@ -1,7 +1,9 @@
-﻿using Conduit.Engine.Graphics.Shaders;
+﻿using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Shaders;
+using Conduit.Engine.Graphics.Textures;
 using System.Numerics;
 
-namespace Conduit.Engine.Content
+namespace Conduit.Engine.Graphics.Materials
 {
     public class UnlitMaterial : Material
     {
@@ -14,6 +16,12 @@ namespace Conduit.Engine.Content
         {
             get => TryGetProperty("u_Color", out Vector4 color) ? color : default;
             set => SetProperty("u_Color", value);
+        }
+
+        public ITexture Texture
+        {
+            get => TryGetProperty("u_Texture", out ITexture texture) ? texture : default;
+            set => SetProperty("u_Texture", value);
         }
     }
 }

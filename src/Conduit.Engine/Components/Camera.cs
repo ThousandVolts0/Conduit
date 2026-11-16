@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using Conduit.Engine.Rendering;
+using Conduit.Engine.Rendering.Viewports;
 
 namespace Conduit.Engine.Components
 {
     public sealed class Camera : Component
     {
-        public float OrthographicSize { get; set; } = 1.0f;
+        public float OrthographicSize { get; set; } = 5.0f;
         public float NearPlane { get; set; } = 0.1f;
         public float FarPlane { get; set; } = 100.0f;
 
@@ -29,7 +29,7 @@ namespace Conduit.Engine.Components
             if (transform == null)
                 return Matrix4x4.Identity;
 
-            if (!Matrix4x4.Invert(transform.ModelMatrix, out Matrix4x4 res))
+            if (!Matrix4x4.Invert(transform.GetModelMatrix(), out Matrix4x4 res))
                 throw new InvalidOperationException("Transform is not invertible");
 
             return res;

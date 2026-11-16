@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-namespace Conduit.Engine.Rendering
+namespace Conduit.Engine.Rendering.Viewports
 {
     // Represents a rectangular part of the screen using normalized coordinates (0.0 to 1.0) for X and Y, and width and height as fractions of the total screen size.
     public struct NormalizedViewport

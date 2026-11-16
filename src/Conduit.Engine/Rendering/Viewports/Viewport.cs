@@ -1,4 +1,4 @@
-﻿namespace Conduit.Engine.Rendering
+﻿namespace Conduit.Engine.Rendering.Viewports
 {
     // Represents a rectangular part of the screen using screen pixel coordinates
     public struct Viewport

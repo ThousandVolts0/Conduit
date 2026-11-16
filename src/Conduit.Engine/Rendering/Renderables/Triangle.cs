@@ -1,4 +1,6 @@
 ﻿using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Materials;
+using Conduit.Engine.Rendering.Renderables;
 
 namespace Conduit.Engine.Rendering.Shapes
 {

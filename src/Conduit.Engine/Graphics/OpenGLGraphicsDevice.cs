@@ -1,10 +1,16 @@
-﻿using Silk.NET.OpenGL;
-using System.Drawing;
-using Silk.NET.Windowing;
-using Microsoft.Extensions.Logging;
+﻿using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Data;
+using Conduit.Engine.Graphics.Materials;
 using Conduit.Engine.Graphics.Shaders;
-using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Textures;
 using Conduit.Engine.Rendering;
+using Conduit.Engine.Rendering.Viewports;
+using Microsoft.Extensions.Logging;
+using Silk.NET.OpenGL;
+using Silk.NET.Windowing;
+using StbImageSharp;
+using System.Drawing;
+using System.Reflection.Metadata;
 
 namespace Conduit.Engine.Graphics
 {
@@ -25,9 +31,15 @@ namespace Conduit.Engine.Graphics
             uint vbo = CreateVBO(data);
             uint ebo = CreateEBO(data);
 
-            const uint posAttrib = 0;
-            _gl.EnableVertexAttribArray(posAttrib);
-            _gl.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); 
+            // 3 floats for position (x,y,z)
+            // 2 for texture coordinates (u, v)
+            const uint posLoc = 0;
+            _gl.EnableVertexAttribArray(posLoc);
+            _gl.VertexAttribPointer(posLoc, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+
+            const uint texCoordLoc = 1;
+            _gl.EnableVertexAttribArray(texCoordLoc);
+            _gl.VertexAttribPointer(texCoordLoc, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (3 * sizeof(float)));
 
             _loadedMeshes[data] = new()
             {
@@ -41,7 +53,7 @@ namespace Conduit.Engine.Graphics
 
         public void Draw(Mesh mesh, Material material, RenderInfo info)
         {
-            _logger.LogDebug("Drawing mesh: {Mesh} with material {Material}", mesh, material);
+            _logger.LogDebug("Drawing mesh: {Mesh} with material {Material}", mesh.GetType().Name, material.GetType().Name);
 
             GPUMesh gpuMesh = _loadedMeshes.ContainsKey(mesh) ? _loadedMeshes[mesh] : LoadMesh(mesh);
             IShader shader = material.Shader;
@@ -61,7 +73,63 @@ namespace Conduit.Engine.Graphics
         {
             uint vert = CreateShader(ShaderType.VertexShader, source.Vertex);
             uint frag = CreateShader(ShaderType.FragmentShader, source.Fragment);
-            return new OpenGLShader(_gl, frag, vert);
+
+            uint handle = _gl.CreateProgram();
+
+            _gl.AttachShader(handle, vert);
+            _gl.AttachShader(handle, frag);
+
+            _gl.LinkProgram(handle);
+            _gl.GetProgram(handle, ProgramPropertyARB.LinkStatus, out int lStatus);
+
+            if (lStatus != (int)GLEnum.True)
+                throw new Exception($"Program failed to link: {_gl.GetProgramInfoLog(handle)}");
+
+            _gl.DetachShader(handle, vert);
+            _gl.DetachShader(handle, frag);
+            _gl.DeleteShader(vert);
+            _gl.DeleteShader(frag);
+
+            return new OpenGLShader(_gl, handle);
+        }
+
+        public unsafe ITexture CreateTexture(ImageResult result)
+        {
+            uint handle = _gl.GenTexture();
+            _gl.ActiveTexture(TextureUnit.Texture0);
+            _gl.BindTexture(TextureTarget.Texture2D, handle);
+
+            ImageResult flipped = FlipImageVertically(result);
+            
+            fixed (byte* ptr = flipped.Data)
+                _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)result.Width,
+                    (uint)result.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+
+            _gl.BindTexture(TextureTarget.Texture2D, 0);
+
+            return new OpenGLTexture(_gl, handle);
+        }
+
+        private ImageResult FlipImageVertically(ImageResult image)
+        {
+            byte[] flippedData = new byte[image.Data.Length];
+
+            int bytesPerPixel = (int)image.Comp;
+            int bytesPerRow = image.Width * bytesPerPixel;
+
+            for (int row = 0; row < image.Height; row++)
+            {
+                int sourceRow = image.Height - 1 - row; 
+
+                int flippedRowStart = row * bytesPerRow;
+                int sourceRowStart = sourceRow * bytesPerRow;
+
+                for (int i = 0; i < bytesPerRow; i++)
+                    flippedData[flippedRowStart + i] = image.Data[sourceRowStart + i];
+            }
+
+            image.Data = flippedData;
+            return image;
         }
 
         public void SetViewport(Viewport view)

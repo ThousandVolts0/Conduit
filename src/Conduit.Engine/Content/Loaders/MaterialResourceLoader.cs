@@ -1,4 +1,5 @@
-﻿using Conduit.Engine.Graphics.Shaders;
+﻿using Conduit.Engine.Graphics.Materials;
+using Conduit.Engine.Graphics.Shaders;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 

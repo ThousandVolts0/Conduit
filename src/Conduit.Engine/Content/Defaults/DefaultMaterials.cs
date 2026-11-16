@@ -1,4 +1,6 @@
-﻿namespace Conduit.Engine.Content.Defaults
+﻿using Conduit.Engine.Graphics.Materials;
+
+namespace Conduit.Engine.Content.Defaults
 {
     public class DefaultMaterials
     {

@@ -1,5 +1,10 @@
-﻿using Silk.NET.OpenGL;
+﻿using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Textures;
+using Silk.NET.OpenGL;
 using System.Numerics;
+using TextureWrapMode = Conduit.Engine.Graphics.Textures.TextureWrapMode;
+using TextureFilterMode = Conduit.Engine.Graphics.Textures.TextureFilterMode;
+using System.Diagnostics;
 
 namespace Conduit.Engine.Graphics.Shaders
 {
@@ -7,29 +12,11 @@ namespace Conduit.Engine.Graphics.Shaders
     {
         public uint Handle { get; }
         private Dictionary<string, int> _uniformLocations = new();
-        private GL _gl;
-        internal OpenGLShader(GL gl, uint frag, uint vert)
+        private readonly GL _gl;
+        internal OpenGLShader(GL gl, uint handle)
         {
             _gl = gl;
-            Handle = _gl.CreateProgram();
-            LinkShaders(vert, frag);
-        }
-
-        private void LinkShaders(uint vert, uint frag)
-        {
-            _gl.AttachShader(Handle, vert);
-            _gl.AttachShader(Handle, frag);
-
-            _gl.LinkProgram(Handle);
-            _gl.GetProgram(Handle, ProgramPropertyARB.LinkStatus, out int lStatus);
-
-            if (lStatus != (int)GLEnum.True)
-                throw new Exception($"Program failed to link: {_gl.GetProgramInfoLog(Handle)}");
-
-            _gl.DetachShader(Handle, vert);
-            _gl.DetachShader(Handle, frag);
-            _gl.DeleteShader(vert);
-            _gl.DeleteShader(frag);
+            Handle = handle;
         }
 
         private int GetUniformLocation(string name)
@@ -72,12 +59,60 @@ namespace Conduit.Engine.Graphics.Shaders
                 case Vector4 v4:
                     _gl.Uniform4(GetUniformLocation(name), v4);
                     break;
+                case ITexture t:
+                    _gl.ActiveTexture(TextureUnit.Texture0);
+                    _gl.BindTexture(TextureTarget.Texture2D, t.Handle);
+
+                    _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)ToGLEnum(t.WrapU));
+                    _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)ToGLEnum(t.WrapV));
+
+                    _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, t.HasMipmaps 
+                        ? (int)ToGLEnum(t.FilterMode, t.MipmapFilterMode) 
+                        : (int)ToGLEnum(t.FilterMode));
+                    _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)ToGLEnum(t.FilterMode));
+
+                    _gl.Uniform1(GetUniformLocation(name), 0);
+                    break;
                 case Matrix4x4 m4:
                     _gl.UniformMatrix4(GetUniformLocation(name), 1, false, ref m4.M11);
                     break;
                 default:
                     throw new Exception($"Unsupported property type: {value?.GetType()}");
             }
+        }
+
+        private GLEnum ToGLEnum(TextureWrapMode wrapMode)
+        {
+            return wrapMode switch
+            {
+                TextureWrapMode.Repeat => GLEnum.Repeat,
+                TextureWrapMode.ClampToEdge => GLEnum.ClampToEdge,
+                TextureWrapMode.MirrorRepeat => GLEnum.MirroredRepeat,
+                TextureWrapMode.MirrorClampToEdge => GLEnum.MirrorClampToEdge,
+                _ => throw new UnreachableException()
+            };
+        }
+
+        private GLEnum ToGLEnum(TextureFilterMode filterMode)
+        {
+            return filterMode switch
+            {
+                TextureFilterMode.Linear => GLEnum.Linear,
+                TextureFilterMode.Nearest => GLEnum.Nearest,
+                _ => throw new UnreachableException()
+            };
+        }
+
+        private GLEnum ToGLEnum(TextureFilterMode filterMode, MipmapFilterMode mipmapFilterMode)
+        {
+            return (filterMode, mipmapFilterMode) switch
+            {
+                (TextureFilterMode.Linear, MipmapFilterMode.Linear) => GLEnum.LinearMipmapLinear,
+                (TextureFilterMode.Linear, MipmapFilterMode.Nearest) => GLEnum.LinearMipmapNearest,
+                (TextureFilterMode.Nearest, MipmapFilterMode.Nearest) => GLEnum.NearestMipmapNearest,
+                (TextureFilterMode.Nearest, MipmapFilterMode.Linear) => GLEnum.NearestMipmapLinear,
+                _ => throw new UnreachableException()
+            };
         }
 
         public override string ToString()

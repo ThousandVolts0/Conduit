@@ -2,10 +2,15 @@
 using Conduit.Engine.Content;
 using Conduit.Engine.Core;
 using Conduit.Engine.Graphics;
+using Conduit.Engine.Graphics.Materials;
+using Conduit.Engine.Mathematics;
+using Conduit.Engine.Rendering.Viewports;
 using Microsoft.Extensions.Logging;
+using Silk.NET.Input;
 using Silk.NET.Windowing;
 using System.Drawing;
 using System.Numerics;
+using Vector2 = Conduit.Engine.Mathematics.Vector2;
 
 namespace Conduit.Engine.Rendering
 {
@@ -42,8 +47,6 @@ namespace Conduit.Engine.Rendering
             }
         }
 
-        private Size GetWindowSize() => new Size(_window.Size.X, _window.Size.Y);
-
         private void Render(Renderer renderer, Camera camera)
         {
             Transform? entityTransform = renderer.Entity.GetComponent<Transform>();
@@ -52,13 +55,15 @@ namespace Conduit.Engine.Rendering
             Mesh mesh = renderer.Renderable.Mesh;
             Material material = renderer.Renderable.Material ?? _resources.Defaults.Materials.Unlit; // Fallback to default material if none specified
 
-            Matrix4x4 world = entityTransform != null ? entityTransform.ModelMatrix : Matrix4x4.Identity;
+            Matrix4x4 model = entityTransform?.GetModelMatrix() ?? Matrix4x4.Identity;
             Matrix4x4 view = camera.GetViewMatrix(cameraTransform);
             Matrix4x4 proj = camera.GetProjectionMatrix(GetWindowSize());
 
-            RenderInfo info = new(world, view, proj);
+            RenderInfo info = new(model, view, proj);
             _graphicsDevice.Draw(mesh, material, info);
         }
+
+        private Size GetWindowSize() => new Size(_window.Size.X, _window.Size.Y);
 
         private void UpdateViewport(Camera camera)
         {

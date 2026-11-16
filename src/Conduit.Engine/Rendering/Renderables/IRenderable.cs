@@ -1,6 +1,7 @@
 ﻿using Conduit.Engine.Content;
+using Conduit.Engine.Graphics.Materials;
 
-namespace Conduit.Engine.Rendering
+namespace Conduit.Engine.Rendering.Renderables
 {
     public interface IRenderable
     {

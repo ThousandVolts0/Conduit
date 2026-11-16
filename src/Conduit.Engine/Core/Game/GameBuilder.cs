@@ -6,6 +6,8 @@ using Conduit.Engine.Graphics;
 using Conduit.Engine.Content.Loaders;
 using Conduit.Engine.Content;
 using Conduit.Engine.Rendering;
+using Conduit.Engine.Graphics.Materials;
+using Conduit.Engine.Graphics.Textures;
 
 namespace Conduit.Engine.Core.Game
 {
@@ -71,7 +73,7 @@ namespace Conduit.Engine.Core.Game
 
             Dictionary<Type, object> _resourceLoaders = new()
             {
-                { typeof(Texture), new TextureResourceLoader(loggerFactory.CreateLogger<TextureResourceLoader>()) },
+                { typeof(ITexture), new TextureResourceLoader(loggerFactory.CreateLogger<TextureResourceLoader>(), graphicsDevice) },
                 { typeof(Material), new MaterialResourceLoader(loggerFactory.CreateLogger<MaterialResourceLoader>()) },
                 { typeof(IShader), new ShaderResourceLoader(loggerFactory.CreateLogger<ShaderResourceLoader>(), graphicsDevice) }
             };

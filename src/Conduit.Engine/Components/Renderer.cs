@@ -1,4 +1,4 @@
-﻿using Conduit.Engine.Rendering;
+﻿using Conduit.Engine.Rendering.Renderables;
 
 namespace Conduit.Engine.Components
 {

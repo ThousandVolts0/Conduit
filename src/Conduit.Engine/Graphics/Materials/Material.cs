@@ -1,6 +1,6 @@
 ﻿using Conduit.Engine.Graphics.Shaders;
 
-namespace Conduit.Engine.Content
+namespace Conduit.Engine.Graphics.Materials
 {
     public class Material
     {
@@ -40,7 +40,7 @@ namespace Conduit.Engine.Content
 
         public IReadOnlyDictionary<string, object> GetProperties() => _properties.AsReadOnly();
 
-        public void ApplyProperties()
+        internal void ApplyProperties()
         {
             Shader.Bind();
             foreach(var property in _properties)

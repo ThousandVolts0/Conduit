@@ -14,21 +14,20 @@ namespace Conduit.Engine.Components
         private Vector2 _scale = Vector2.One;
         public ref Vector2 Scale => ref _scale;
 
-        private float _rotation = 0f;
-        public ref float Rotation => ref _rotation;
+        public float Rotation { get; set; } = 0f;
 
         public Transform(Vector2 position, Vector2 scale, float rotation)
         {
-            _position = position;
-            _scale = scale;
-            _rotation = rotation;
+            Position = position;
+            Scale = scale;
+            Rotation = rotation;
         }
 
         public Transform() { }
 
-        internal Matrix4x4 ModelMatrix =>
+        public Matrix4x4 GetModelMatrix() => 
             Matrix4x4.CreateTranslation(Position.X, Position.Y, 0) *
-            Matrix4x4.CreateRotationZ(Rotation) *
+            Matrix4x4.CreateRotationZ(Rotation * (MathF.PI / 180f)) *
             Matrix4x4.CreateScale(Scale.X, Scale.Y, 1);
     }
 }

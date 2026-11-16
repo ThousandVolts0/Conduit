@@ -1,4 +1,4 @@
-﻿namespace Conduit.Engine.Graphics
+﻿namespace Conduit.Engine.Graphics.Data
 {
     public class GPUMesh
     {

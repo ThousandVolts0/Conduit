@@ -36,25 +36,34 @@ namespace Conduit.Engine.Mathematics
             }
         }
 
-        // Operator overrides for vector arithmetic
+        // Vector addition
         public static Vector2Int operator +(Vector2Int a, Vector2Int b)
         {
             return new Vector2Int(a.X + b.X, a.Y + b.Y);
         }
 
+        // Vector subtraction
         public static Vector2Int operator -(Vector2Int a, Vector2Int b)
         {
             return new Vector2Int(a.X - b.X, a.Y - b.Y);
         }
 
+        // Scalar multiplication
         public static Vector2Int operator *(Vector2Int a, int b)
         {
             return new Vector2Int(a.X * b, a.Y * b);
         }
 
+        // Scalar multiplication
         public static Vector2Int operator *(int a, Vector2Int b)
         {
             return new Vector2Int(b.X * a, b.Y * a);
+        }
+
+        // Scalar division
+        public static Vector2Int operator /(Vector2Int a, int b)
+        {
+            return new Vector2Int(a.X / b, a.Y / b);
         }
 
         // Component-wise multiplication
@@ -63,22 +72,19 @@ namespace Conduit.Engine.Mathematics
             return new Vector2Int(a.X * b.X, a.Y * b.Y);
         }
 
-        public static Vector2Int operator /(Vector2Int a, int b)
-        {
-            return new Vector2Int(a.X / b, a.Y / b);
-        }
-
         // Component-wise division
         public static Vector2Int operator /(Vector2Int a, Vector2Int b)
         {
             return new Vector2Int(a.X / b.X, a.Y / b.Y);
         }
 
+        // Equality comparison
         public static bool operator ==(Vector2Int a, Vector2Int b)
         {
             return a.X == b.X && a.Y == b.Y;
         }
 
+        // Inequality comparsion
         public static bool operator !=(Vector2Int a, Vector2Int b)
         {
             return a.X != b.X || a.Y != b.Y;
@@ -89,14 +95,14 @@ namespace Conduit.Engine.Mathematics
         public static Vector2Int One => new Vector2Int(1, 1);
         public static Vector2Int MinusOne => new Vector2Int(-1, -1);
         public static Vector2Int MaxValue => new Vector2Int(int.MaxValue, int.MaxValue);
-
         public static Vector2Int Up => new Vector2Int(0, 1);
         public static Vector2Int Down => new Vector2Int(0, -1);
         public static Vector2Int Right => new Vector2Int(1, 0);
         public static Vector2Int Left => new Vector2Int(-1, 0);
 
-        public static explicit operator Vector2D<int>(Vector2Int v) => new Vector2D<int>(v.X, v.Y);
-        public static explicit operator Vector2Int(Vector2D<int> v) => new Vector2Int(v.X, v.Y);
+        // Conversions to Silk.NET.Maths.Vector2D<int>
+        public static explicit operator Silk.NET.Maths.Vector2D<int>(Vector2Int v) => new Silk.NET.Maths.Vector2D<int>(v.X, v.Y);
+        public static explicit operator Vector2Int(Silk.NET.Maths.Vector2D<int> v) => new Vector2Int(v.X, v.Y);
 
         public override string ToString() => $"({X}, {Y})";
         public override bool Equals([NotNullWhen(true)] object? obj)

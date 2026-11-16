@@ -37,8 +37,8 @@ namespace Conduit.Samples.BasicGame
         protected override void OnInitialize(GameContext ctx)
         {
             // todo:
-            // add own color class containing rgba floats
             // add source generator that generates csharp material class from .mat files using their .shader reference
+            // add more tests, and improve the ones that exists, use Theory more
             // also return that generated class from resource loader, as it self, not the broad Material instance, so u can access its individual properties
             // make unlit material accept plain color and not require texture, maybe just pass in flat white texture as default
 

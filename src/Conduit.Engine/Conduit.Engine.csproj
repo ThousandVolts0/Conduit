@@ -9,9 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <Content Include="Resources\**\*">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+	<Content Include="Resources\**\*">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
+	<InternalsVisibleTo Include="Conduit.Engine.Tests"/>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
     <PackageReference Include="Silk.NET.Input" Version="2.23.0" />
     <PackageReference Include="Silk.NET.Maths" Version="2.23.0" />
@@ -21,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Properties\" />
     <Folder Include="Resources\Defaults\Materials\" />
   </ItemGroup>
 

@@ -68,11 +68,11 @@ namespace Conduit.Engine.Tests
         }
 
         [Fact]
-        public void Magnitude_Works()
+        public void Length_Works()
         {
             Vector2 vec = new Vector2(3, 4);
 
-            Assert.Equal(5, vec.Magnitude);
+            Assert.Equal(5, vec.Length);
         }
 
         [Fact]
